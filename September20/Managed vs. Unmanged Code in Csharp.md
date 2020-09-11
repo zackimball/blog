@@ -1,0 +1,13 @@
+# Managed vs Unmanaged Code
+
+One of the things that has recently come up in my development life was the question of managed vs. unmanaged code in .NET. I have always had a vague understanding of what it meant. There's the inutitive answer, which is the one that I gave in response to the difference, however there's some important bits that were missing. Let's tuck into this one, it's time for some theory.
+
+## What is .NET?
+
+.NET is a huge framework, and even more complex with the recent inclusion of cross-platform support. However, it's that word "framework" that has always fascinated. Thinking of javascript frameworks, they're essentially extremely sophisticated wrappers for javascript. Angular, React, and Vue all share this common theme: they have their own vernacular through which you express javascript ideas. I've always thought that to be similar to how C#/F#/VB operated. And to me, that was always the key difference between managed and unmanaged code. Managed code was items that were "native" to C#/F#/VB, but within the .NET framework you could incorporate the nebulus "other things". Which, is sort of true but not exactly true.
+
+What .NET does is create this intermediary runtime called the Common Language Runtime (CLR). When you press that build button in Visual studio, the build tooling takes your C# and creates a dynamically linked library (DLL) that is a set of instructions that are in this IL (intermediate language) that can be just-in-time compiled to the OS's native instruction set. From a certain point of view, C#/F#/VB are all different coats of paint for what is actually being run within the CLR. This is also where the vast majority of your work will be. With this common language runtime, you get some natural benefits from how .NET handles things that at least I take for granted. Memory management is definitely the biggest thing that I always completely forget until I hear someone speaking in Rust or C/C++.
+
+## So what is "Managed"
+
+Managed is code you write using C# that will work through and within the CLR. It follows the rules of the runtime and uses code that wraps native OS functionality. When you write an application using something along the lines of Xamarin, you're implementing items that are managed. Your code that you write (generally, unless it's "unmanaged" or "unsafe") speaks to a translator hosted within the CLR. This translator passes off information to the OS and is also called a wrapper, as it "wraps" the native functionality into a neat package you can call and work with in your preferred .NET language. This is incredbly handy as you get the protections of working within the CLR. Where it can be tricky is there is essentially no direct access to the OS's native APIs.
