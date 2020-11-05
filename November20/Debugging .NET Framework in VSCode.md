@@ -232,5 +232,116 @@ For me, this took immediately and I had my shiny new package rolling immediately
 
 ## VS Code Tasks
 
-Now, the beast has risen it's ugly head. The hardest part of getting up and rolling in VS Code: Tasks. I've not managed to get this to 100% of Visual Studio, but from a day to day standpoint, what's we've done already covers about 95% of what I find myself doing. But let's see if we can't use some of VSCode's configuration goodies to get this a little further.
+Now, the beast has risen it's ugly head. The hardest part of getting up and rolling in VS Code: Tasks. I've not managed to get this to 100% of Visual Studio, but from a day to day standpoint, what's we've done already covers about 95% of what I find myself doing. In general, it's been easier to run the commands manually in my terminal, but VSCode has this really interesting set of tooling around starting up the application, so I went ahead and worked out how to get the process running using this method. I, personally, would probably use the set up that has been put into place so far, but this is the last mile so let's finish this.
+
+VS Code relies on a launch.json to manage your debugging/application runnning. For this application, this is how I've configured that launch.json:
+
+```json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "pwa-chrome",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Start App",
+            "type": "clr",
+            "request": "attach",
+            "processName": "iisexpress",
+            "preLaunchTask": "startChromeDebug",
+            "postDebugTask": "iisStop"
+        }
+    ],
+    "compounds":[
+        {
+            "name": "Launch apps and attach debuggers",
+            "configurations": [ "Start App","Attach to Chrome"]
+        }
+    ]
+}
+```
+
+As a basic rundowm, there are two configurations present: one attaches the debugger to Chrome, and the other calls all of the startup processes. In this case, they are referencing a `tasks.json` file that runs various commands that I've placed in there. These are chained together in a way I will show in a minute. The important thing to note here is that there are two tasks in the "Start App" configuration. There is the pre-launch task, which is run before trying to attach the debugger, and there is the "postDebugTask", which is a cleanup process to stop the instance of IISExpress I am running. 
+
+Initially when I was putting this together, though, I couldn't figure out how to attach both debuggers (the chrome debugger and the C# debugger). These configurations were run either one or the other, which was workable but not the full picture I was hoping for. Turns out, VS Code supports running multiple debug configurations through something they called "compounds". In this section, we define the combination we want to run, in this case first "Start App" followed by "Attach to Chrome". The first one will run scripting to build the application, start up IISExpress, and start Chrome with the debugging port open. The second one will attach the Chrome debugging extension to the instance of Chrome we just opened. Additionally, I've added a tear down task to the "Start App" configuration that will stop the instance of IISExpress we're running. 
+
+Now, let's take a look at these tasks.
+
+```json
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "msbuild",
+            "type": "shell",
+            "command": "msbuild",
+            "args": [
+                "/p:Configuration=Debug",
+                "/t:build",
+                "-m"
+            ],
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label":"iisStart",
+            "type":"shell",
+            "dependsOn":"msbuild",
+            "command":"Start-Process",
+            "args": ["iisexpress","/siteid:2"],
+            "presentation": {
+                "reveal": "silent",
+            }
+        },
+        {
+            "label":"iisStop",
+            "type":"shell",
+            "command":"Stop-Process",
+            "args": ["-Name","iisexpress"]
+        },
+        {
+            "label":"startChromeDebug",
+            "type":"shell",
+            "command":"chrome",
+            "dependsOn":"iisStart",
+            "args":[
+                "https://localhost:44315/",
+                "--remote-debugging-port=9222"
+            ]
+        }
+    ]
+}
+```
+
+This is why I just usually run things in a CLI by hand. Figuring all of this out just doesn't feel worth it, but hopefully it helps someone. 
+
+The first task is the msbuild task, which will call the msbuild exetuable and run it to build our debug configuration.
+
+```json
+{
+    "label": "msbuild",
+    "type": "shell",
+    "command": "msbuild",
+    "args": [
+        "/p:Configuration=Debug",
+        "/t:build",
+        "-m"
+    ],
+    "presentation": {
+        "reveal": "silent"
+    },
+    "problemMatcher": "$msCompile"
+}
+```
 
