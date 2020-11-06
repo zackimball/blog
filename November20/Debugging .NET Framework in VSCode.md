@@ -2,14 +2,13 @@
 
 Have you used VS Code? 
 
-But seriously, there are lots of reasons to love Visual Studio, especially with the Community option available. With that in mind, however, it's hard to deny that VS Code is hands down a more comfortable place for a lot of developers. I myself spend as little time in Visual Studio as possible these days as more often than not, there's just a lot more overhead to loading and running Visual Studio than I feel is necessary for most tasks. They do a great job on that team, and the level of abstraction is amazing. But while making so many things easier, this makes some things harder as when you run Visual Studio for the first time, there's just so many buttons, menus, hotkeys, and functionality that you're just not going to know how to use at first. And to be honest, I don't use most of these things on a daily basis, which just feels like it's in the way. It's all helpful, but I am not the sort that likes to have all of his tools open and everywhere on the workbench.
+But seriously, there are lots of reasons to love Visual Studio, especially with the Community option available as that version is an extremely robust environment. However, there's a fundamental difference in purpose that makes me prefer VS Code, at least for most of what I do on the daily. As a developer, we mostly edit text, that's it. Actually, maybe we mostly just think about text, but that's another topic. Visual Studio is a full-bore, IDE. It's something that combines a lot of tools into one, super dense software package. VS Code is at it's heart a text editor. A very fancy, extremely powerful, super feature reach text editor that blurs the line between text editor and IDE, but still, a text editor. This means most of your tools will be BYO. I think that's why people love it. It's a simpler concept, and you're not inundated with hundreds of features that you're just not going to need all that often. I develop using both, but my "Daily Driver" as it were is VS Code. I think both serve their purpose in my workflow.
 
-However, support for C# is pretty much dedicated exclusively for .NET Core out of the box. What they don't tell you on the back of the box, is that it is actually possible to run and work with .NET framework apps in VS Code. It's just a little less supported than Visual Studio.
+However, support for C# in VS Code is pretty much dedicated exclusively for .NET Core out of the box. What they don't tell you on the back of the box, is that it is actually possible to run and work with .NET framework apps in VS Code. Which is where we get to some of your BYO tooling. It's no doubt installed on your machine already, because who doesn't have Visual Studio if you're working with Framework. The assumption underpinning this blog is you have on hand some .NET framework project, but you're like me and have started to appreciate a simpler environment that you can get just about everything done in without having much in the way of features that are adding what feels like clutter when you don't need them. 
 
-# All Right, I'm Sold
+If you get stuck, I've got the basic working version up on Git, don't worry about what the application, it's basically just a stubbed out project from one of Visual Studio's templates. [Git: blog.VSCodeDemo](https://github.com/zackimball/blog.vscodeDemo)
 
-Well, hold on. There's some caveats. And whether or not they're dealbreakers for you will really depend on how into working with `.csproj`/`.sln` files or manually managing your NuGet packages you are. It's not a dealbreaker for me, and I'm going to try to find some ways around that, but these are just not going to be things you have Visual Studio hold your hand through. It's not a deal breaker for many, but for some, it's not for you and that's fine.
-
+Well, hold on. There's some caveats. And whether or not they're dealbreakers for you will really depend on how into working with `.csproj`/`.sln` files or manually managing your NuGet packages you are. It's not a dealbreaker for me, and I'm going to try to find some ways around that, but these are just not going to be things you have Visual Studio hold your hand through. It's not a deal breaker for many, but for some, it's not for you and that's fine. In fact, generally speaking if you're trying to work on a Framework project, a lot of what you would need the Nuget Package Manager for is already done. I will have some details on how to use the Nuget CLI, but that is a deep topic that if there's enough interest in I will tackle later. We are basically going to be using it just to pull in packages currently configured for the project.
 
 ## Adding a few things to your path
 
@@ -29,11 +28,17 @@ Next, load up IIS Express into your path as well.
 c:\Program Files\IIS Express\
 ```
 
+Lastly, add Chrome to your command line. We're gonna need it to trigger a startup task later:
+
+```
+C:\Program Files (x86)\Google\Chrome\Application.
+```
+
 And boom, there you have it. These are all the items you need for your path. Nuget.exe should be accessible from your command line already if you have Visual Studio installed. 
 
 ## Starting a Project
 
-If you're like me, Visual Studio will still have a place in your toolkit if you're still working in .NET Framework. It is what it is, the dotnet foundation has sort of moved on from here. You can make your own custom templates for the `dotnet` CLI, but that falls way outside of scope for this tutorial. You could also build your own solution and project files, but that also falls way out of scope for this article. The goal here is to get you up and running with most of the basics you're used to having. With that in mind, I cheat on this step BIG TIME when starting a new framework project. Crack open Visual Studio and start a new project.
+If you're like me, Visual Studio will still have a place in your toolkit if you're still working in .NET Framework. It is what it is, the .NET Foundation has sort of moved on from here. You can make your own custom templates for the `dotnet` CLI, but that falls way outside of scope for this tutorial. You could also build your own solution and project files, but that also falls way out of scope for this article. The goal here is to get you up and running with most of the basics you're used to having. With that in mind, I cheat on this step BIG TIME when starting a new framework project (although, this blog is really the only time in recent memory that I've needed it). Crack open Visual Studio and start a new project.
 
 For the purpose of following along, the project is going to be an "ASP.NET Web Application (.NET Framework)" project. We're going to call it `VSCodeDemo` if you're following along, and we're targeting Framework 4.8. Also for the purpose of this walk through, it's going to be a "Web Forms" type of project.
 
@@ -101,7 +106,7 @@ That site does not have anything tied to it, and we'll just be taking it out lat
 iisexpress /config:applicationhost.config /site:VSCodeDemo
 ```
 
-IIS Express accepts parameters using the syntax `/{parameter}:{value}`. With that, we're passing in the config parameter and pointing it at the local `applicationhost.config` give to us by the template and passing in our site name VSCodeDemo. Althernatively, we could pass in the `/siteid:2` parameter to target this application. You'll see a new tray icon for IIS Express and now you could open this up in a browser from the tray application or opening the browser and navigating to `localhost:{port in the config}`. With all of that setup, we're now ready to start working on our VSCode configuration.
+IIS Express accepts parameters using the syntax `/{parameter}:{value}`. With that, we're passing in the config parameter and pointing it at the local `applicationhost.config` give to us by the template and passing in our site name VSCodeDemo. Alternatively, we could pass in the `/siteid:2` parameter to target this application. You'll see a new tray icon for IIS Express and now you could open this up in a browser from the tray application or opening the browser and navigating to `localhost:{port in the config}`. With all of that setup, we're now ready to start working on our VSCode configuration.
 
 ## Setup In VSCode
 
@@ -202,7 +207,7 @@ With the power of copying and pasting, grab this site and open the default IIS c
                 </bindings>
             </site>
             [...]
-            <site name="VSCodeDemo" id="3">
+            <site name="VSCodeDemo" id="2">
                 <application path="/" applicationPool="Clr4IntegratedAppPool">
                     <virtualDirectory path="/" physicalPath="C:\Users\icarus\source\repos\VSCodeDemo\VSCodeDemo" />
                 </application>
@@ -218,7 +223,7 @@ With the power of copying and pasting, grab this site and open the default IIS c
     </system.applicationHost>
 ```
 
-With this in your default IIS Express configuration, you can call if from any folder, without needing to specify the config file you're working in. You are now able to feed in the site index or the site name under the `/siteid:3` or `/siteName:VSCodeDemo`. And that's it! We're going to take a look at a few more things that I prefer to have next, but that's the basics. With this in place, you're good to go for most workflows. At least, these are the most essential portions of development for me that I use on the daily. All that I feel is missing from this picture is Nuget and one-button application starting. Believe it or not, Nuget was easy to transition to, so let's do that one next.
+With this in your default IIS Express configuration, you can call if from any folder, without needing to specify the config file you're working in. You are now able to feed in the site index or the site name under the `/siteid:2` or `/siteName:VSCodeDemo`. And that's it! We're going to take a look at a few more things that I prefer to have next, but that's the basics. With this in place, you're good to go for most workflows. At least, these are the most essential portions of development for me that I use on the daily. All that I feel is missing from this picture is Nuget and one-button application starting. Believe it or not, Nuget was easy to transition to, so let's do that one next.
 
 ## Nuget
 
@@ -345,3 +350,51 @@ The first task is the msbuild task, which will call the msbuild exetuable and ru
 }
 ```
 
+To break this down, what happens with the task is it is fed into your CLI, in my case and in most it'll be Power Shell by default. The label is what is used to identify it within the your configurations in `launch.config`. The command is, in this case, the `MSBuild.exe`, which we've added to our path (for me, it was located here: `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin` since it's installed alongside of Visual Studio Community 2019 there). Your `args` are built off of what parameters are fed into the application. Basically, if you can learn how to use a CLI tool, it can be configured here. The flags we're using, as it's for a debug build, specify the flags `/p` for "property", which will locate the "Configuration" property in our `.csproj` file and build accordingly. The `/t` flag will target a process, here we're targeting build, but you can also use "rebuild" or "clean" if needed. Essentially, here is replicated the "Build" button within Visual Studio.
+
+```json
+ {
+    "label":"iisStart",
+    "type":"shell",
+    "dependsOn":"msbuild",
+    "command":"Start-Process",
+    "args": ["iisexpress","/siteid:2"],
+    "presentation": {
+        "reveal": "silent",
+    }
+}
+```
+
+Now, since we're using the PowerShell CLI, in addition to calling the the `msbuild.exe` application, we can also add in PowerShell commands. Setup is the same: the label we're going to call it, the type being "shell" to designate it as a CLI task. The first "new" item is what allows us to chain tasks together in VSCode. The `dependsOn` flag specifies what other tasks need to precede this task in order for it to work. Also, since IISExpress runs continuously until stopped, instead of just calling `iisexpress` from the command line as we normally do, we're going to call `Start-Process`, which allows for control to return to the remaining tasks after the process is started. The args, in this case, are the same ones we've been using to run the site so far. The `presentation/review` flag, in this case at least in my testing, doesn't seem to do what I think it does (I thought it ran it in the background, I believe this is just supressing errors).
+
+```json
+{
+    "label":"iisStop",
+    "type":"shell",
+    "command":"Stop-Process",
+    "args": ["-Name","iisexpress"]
+},
+```
+
+This piece uses PowerShell's `Stop-Process` call in order to end IISExpress when we're done. This is referenced in the `postDebug` flag inside of our `launch.json`. This task works the same, so if you had multiple tear down processes you could effectively configure them here with `dependsOn` flags.
+
+```json
+{
+    "label":"startChromeDebug",
+    "type":"shell",
+    "command":"chrome",
+    "dependsOn":"iisStart",
+    "args":[
+        "https://localhost:44315/",
+        "--remote-debugging-port=9222"
+    ]
+}
+```
+
+The final task we're adding requires for you to add your Chrome browser to your path so that you can call it from your CLI. For me, it was located here:  The parameter you'll need to add is the site's URL from your ApplicationHost.config and the flag enabling your remote debugging port. 
+
+Phew, that was a lot of configuration. However, if you go to your "Debug" tab in your VSCode workspace, you now have multiple configurations available, including in this case a new one labeled "Launch Apps and Debuggers". That's our new compound task that combines ALLLL of this business together, starts your IIS Express, builds the things, starts Chrome, and attaches both the .NET debugger and your Chrome debug tooling.
+
+## Regrets
+
+I have some regrets here, really I do. I thought this would be way simpler and honestly this blog has sucked up a ton of my time with headaches. The vast majority of this time was spent trying to figure out how to get IIS working, I'm really not that great at PowerShell or CLI tooling. Working at it every day, a lot of it gets easier, but for me it still seems simpler (if less efficient) to just run a manual build in the CLI followed by starting IISExpress. It's easy enough to configure the debugger to attach to the IIS Express instance without all of these tasks being wired up, but I feel like these tasks will make someone's QOL better. And I know for a FACT there's dozens of blogs out there getting into each piece of this in major detail, but I have always struggled to understand all of this because often times what I see is the author explaining the thing that they were stuck on instead of walking through the whole process. That's what I wanted to do here, but trust me, I have to thank the internet and all of you command line commandos out there who had snippets of various pieces of the process. 
