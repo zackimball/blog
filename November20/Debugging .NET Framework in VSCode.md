@@ -141,7 +141,7 @@ Look for this section and this is where we will be making some changes:
 [...]
 ```
 
-Ensure that the `Optimize` is set to false. Then, set the debug option to "portable". This converts your debug symbols from .NET Framework specific symbols to the newer open symbols. These are the symbols that can be read by the VSCode C# extension. 
+Ensure that the `Optimize` is set to false, this caused me some issues when I didn't spot it as being an issue. Then, set the debug option to "portable". This converts your debug symbols from .NET Framework specific symbols to the newer open symbols. These are the symbols that can be read by the VSCode C# extension. 
 
 Now, add a folder specific for the VSCode configuration in your project's root directory call `.vscode` and a `launch.json` file. For this config, we're going to add the following:
 
@@ -233,7 +233,9 @@ If you have VS installed, you more than likely already have the nuget cli instal
 nuget install Newtonsoft.Json -Version 12.0.3
 ```
 
-For me, this took immediately and I had my shiny new package rolling immediately. It does mean that instead of using the Package Manager GUI, you'll be using the nuget site to find packages and get the correct versions for your project, but this to me was a small trade off as I found the package manager GUI to be a little tough to use anyway. So, nuget's done and dusted. 
+For me, this took immediately and I had my shiny new package rolling immediately. It does mean that instead of using the Package Manager GUI, you'll be using the nuget site to find packages and get the correct versions for your project, but this to me was a small trade off as I found the package manager GUI to be a little tough to use anyway. If you have pulled down an already established Framework project, you can do a `nuget restore` command in the root of your project and it will pull in those packages as well.
+
+With that, nuget's done and dusted.
 
 ## VS Code Tasks
 
@@ -275,7 +277,7 @@ VS Code relies on a launch.json to manage your debugging/application runnning. F
 
 As a basic rundowm, there are two configurations present: one attaches the debugger to Chrome, and the other calls all of the startup processes. In this case, they are referencing a `tasks.json` file that runs various commands that I've placed in there. These are chained together in a way I will show in a minute. The important thing to note here is that there are two tasks in the "Start App" configuration. There is the pre-launch task, which is run before trying to attach the debugger, and there is the "postDebugTask", which is a cleanup process to stop the instance of IISExpress I am running. 
 
-Initially when I was putting this together, though, I couldn't figure out how to attach both debuggers (the chrome debugger and the C# debugger). These configurations were run either one or the other, which was workable but not the full picture I was hoping for. Turns out, VS Code supports running multiple debug configurations through something they called "compounds". In this section, we define the combination we want to run, in this case first "Start App" followed by "Attach to Chrome". The first one will run scripting to build the application, start up IISExpress, and start Chrome with the debugging port open. The second one will attach the Chrome debugging extension to the instance of Chrome we just opened. Additionally, I've added a tear down task to the "Start App" configuration that will stop the instance of IISExpress we're running. 
+Initially when I was putting this together, though, I couldn't figure out how to attach both debuggers (the chrome debugger and the C# debugger). These configurations were run either one or the other, which was workable but not the full picture I was hoping for. Turns out, VS Code supports running multiple debug configurations through something they called "compounds". In this section, we define the combination we want to run, in this case first "Start App" followed by "Attach to Chrome". The first one will run scripting to build the application, start up IIS Express, and start Chrome with the debugging port open. The second one will attach the Chrome debugging extension to the instance of Chrome we just opened. Additionally, I've added a tear down task to the "Start App" configuration that will stop the instance of IIS Express we're running. 
 
 Now, let's take a look at these tasks.
 
@@ -328,8 +330,6 @@ Now, let's take a look at these tasks.
     ]
 }
 ```
-
-This is why I just usually run things in a CLI by hand. Figuring all of this out just doesn't feel worth it, but hopefully it helps someone. 
 
 The first task is the msbuild task, which will call the msbuild exetuable and run it to build our debug configuration.
 
